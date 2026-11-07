@@ -140,9 +140,9 @@ Tests for unfinished functions are marked `pending` (expected to fail with `NotI
 
 | Member | Role | Owns |
 |---|---|---|
-| Partner 1 — TODO name | RAG & AI Engineer | `rag/`, RAG tests, architecture |
-| Partner 2 — TODO name | Full-Stack & Integration Engineer | `app.py`, config, README, integration, GitHub |
-| Partner 3 — TODO name | QA, Evaluation & Business Lead | evaluation dataset and report, business, marketing, slides, demo |
+| Partner 1 — Taqwa | RAG & AI Engineer | `rag/`, RAG tests, architecture |
+| Partner 2 — Sadeel | Full-Stack & Integration Engineer | `app.py`, config, README, integration, GitHub |
+| Partner 3 — Obada | QA, Evaluation & Business Lead | evaluation dataset and report, business, marketing, slides, demo |
 
 ## Limitations
 
