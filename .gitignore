@@ -1,0 +1,40 @@
+# OWNER: Partner 2 — Full-Stack & Integration Engineer
+
+# --- Secrets (never commit) ---------------------------------------------------
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets.toml
+.streamlit/secrets.toml
+
+# --- Python ----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Virtual environments ----------------------------------------------------
+.venv/
+venv/
+env/
+
+# --- Generated artifacts -----------------------------------------------------
+# The vector index is rebuilt with `python -m rag.pipeline --build-index`.
+storage/
+
+# --- Temporary / editor / OS files ---------------------------------------------
+*.tmp
+*.log
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+~$*
