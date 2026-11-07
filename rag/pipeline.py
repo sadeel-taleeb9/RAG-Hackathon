@@ -8,7 +8,7 @@ CONSUMERS: app.py (Partner 2), tests/test_pipeline.py (Partner 2),
 PURPOSE:
 The ONE public entry point of the RAG system:
 
-    from rag.pipeline import answer_question
+    from Rag.pipeline import answer_question
     response = answer_question("How many credit hours ...?")
 
 and the offline index builder:
@@ -54,7 +54,7 @@ import re
 import time
 from typing import TYPE_CHECKING, Any
 
-from rag.schemas import (
+from Rag.schemas import (
     STATUS_ANSWERED,
     STATUS_INSUFFICIENT_EVIDENCE,
     STATUS_INVALID_INPUT,
@@ -237,41 +237,63 @@ def get_resources(settings: "Settings") -> dict[str, Any]:
     # 1. Cache key: (str(settings.index_dir), settings.embedding_model). If the
     #    key is in _RESOURCES, return the cached dict (Streamlit reruns the
     #    script on every interaction; module globals survive reruns).
-    # 2. from rag.vector_store import VectorStore
+    # 2. from Rag.vector_store import VectorStore
     #    store = VectorStore.load(settings.index_dir, expected_model=settings.embedding_model)
     # 3. if store.is_stale(settings.docs_dir): logger.warning("PDFs changed since
     #    the index was built; run --build-index") — keep serving.
-    # 4. from rag.embeddings import make_embed_fn, load_embedding_model
+    # 4. from Rag.embeddings import make_embed_fn, load_embedding_model
     #    load_embedding_model(settings.embedding_model)  # warm up now, not on 1st question
     #    embed_fn = make_embed_fn(settings.embedding_model, settings.embedding_batch_size)
-    # 5. from rag.ingest import load_manifest
+    # 5. from Rag.ingest import load_manifest
     #    doc_priority = {name: int(meta.get("priority", 99)) for name, meta in load_manifest(settings.docs_dir).items()}
     # 6. Store and return the dict.
     raise NotImplementedError("Partner 1 must implement get_resources().")
 
 
 def _answer_real(question: str, settings: "Settings") -> RAGResponse:
-    """Real RAG path. Called only with a validated, non-empty question.
+    """Run the real RAG pipeline."""
 
-    Must return a RAGResponse with status answered or insufficient_evidence.
-    Must RAISE (RAGError subclasses) on technical failures — answer_question()
-    turns them into system_error. Never return system_error from here.
-    """
-    # TODO(PARTNER 1):
-    # 1. from rag.retriever import detect_language, retrieve
-    #    from rag.generator import generate_answer, insufficient_response
-    # 2. language = detect_language(question)
-    # 3. res = get_resources(settings)
-    # 4. chunks = retrieve(question, res["store"], res["embed_fn"],
-    #                      settings.top_k, settings.min_similarity, res["doc_priority"])
-    # 5. if not chunks: return insufficient_response(language)   # no LLM call -> no cost
-    # 6. return generate_answer(question, chunks, language, settings)
-    # 7. logger.info per-stage timings (retrieval ms, generation ms) — Partner 3
-    #    reports latency in docs/EVALUATION.md.
-    #
-    # ACCEPTANCE CRITERIA (minute 120 milestone):
-    # python -m rag.pipeline --ask "How many credit hours are required to graduate in Computer Engineering?"
-    # prints status "answered" with a source from the study plan, page 1.
+    from Rag.retriever import detect_language, retrieve
+    from Rag.generator import generate_answer, insufficient_response
+    import time
+
+    language = detect_language(question)
+
+    resources = get_resources(settings)
+
+    start = time.perf_counter()
+
+    chunks = retrieve(
+        question,
+        resources["store"],
+        resources["embed_fn"],
+        settings.top_k,
+        settings.min_similarity,
+        resources["doc_priority"],
+    )
+
+    retrieval_ms = (time.perf_counter() - start) * 1000
+
+    logger.info("Retrieval completed in %.2f ms", retrieval_ms)
+
+    if not chunks:
+        return insufficient_response(language)
+
+    start = time.perf_counter()
+
+    response = generate_answer(
+        question,
+        chunks,
+        language,
+        settings,
+    )
+
+    generation_ms = (time.perf_counter() - start) * 1000
+
+    logger.info("Generation completed in %.2f ms", generation_ms)
+
+    return response
+
     raise NotImplementedError("Partner 1 must implement the real RAG path (_answer_real).")
 
 
@@ -285,10 +307,10 @@ def build_index(settings: "Settings") -> dict[str, Any]:
         IngestionError / EmbeddingError on failure (the CLI prints them).
     """
     # TODO(PARTNER 1):
-    # 1. from rag.ingest import ingest_directory
-    #    from rag.chunker import chunk_pages
-    #    from rag.embeddings import embed_texts, get_embedding_dimension
-    #    from rag.vector_store import VectorStore, file_sha256
+    # 1. from Rag.ingest import ingest_directory
+    #    from Rag.chunker import chunk_pages
+    #    from Rag.embeddings import embed_texts, get_embedding_dimension
+    #    from Rag.vector_store import VectorStore, file_sha256
     # 2. records = ingest_directory(settings.docs_dir, settings.pdf_extractor)
     # 3. chunks = chunk_pages(records, settings.chunk_size, settings.chunk_overlap)
     # 4. vectors = embed_texts([c.text for c in chunks], "passage",
