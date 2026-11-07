@@ -21,9 +21,8 @@ with a message that names the variable and the allowed values, and that
 NEVER contains a secret value.
 
 STATUS:
-The loader and validation below are IMPLEMENTED as minimal infrastructure so
-that mock mode runs from minute 10. The TODO(PARTNER 2) blocks are the
-remaining configuration work.
+IMPLEMENTED and tested (tests/test_pipeline.py). Change tunable values in .env,
+not in this file.
 """
 
 from __future__ import annotations
@@ -39,6 +38,7 @@ PROJECT_ROOT: Path = Path(__file__).resolve().parent
 
 VALID_RAG_MODES = ("mock", "real")
 VALID_PDF_EXTRACTORS = ("pymupdf", "pypdf")
+VALID_LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 
 
 class ConfigurationError(Exception):
@@ -184,22 +184,24 @@ def load_settings(env_file: Path | None = None) -> Settings:
         log_level=_get_str("LOG_LEVEL", "INFO").upper(),
     )
 
+    if settings.log_level not in VALID_LOG_LEVELS:
+        raise ConfigurationError(
+            f"LOG_LEVEL must be one of {VALID_LOG_LEVELS}, got {settings.log_level!r}."
+        )
+
+    if settings.llm_base_url and not settings.llm_base_url.lower().startswith(("http://", "https://")):
+        raise ConfigurationError(
+            f"LLM_BASE_URL must start with http:// or https://, got {settings.llm_base_url!r}."
+        )
+
     if settings.rag_mode == "real":
         _validate_real_mode(settings)
 
-    # TODO(PARTNER 2):
-    # 1. Confirm with Partner 1 at minute 10 that the defaults above
-    #    (CHUNK_SIZE=900, CHUNK_OVERLAP=150, TOP_K=5, embedding model) are the
-    #    starting values. Change them ONLY in .env, not in code, during tuning.
-    # 2. After Partner 1 calibrates MIN_SIMILARITY (rag/retriever.py), copy
-    #    the calibrated value into .env.example with a one-line comment
-    #    stating how it was measured (e.g. "midpoint of in-scope vs
-    #    out-of-scope top-1 scores on tests/questions.json").
-    # 3. Validate LOG_LEVEL against {"DEBUG","INFO","WARNING","ERROR"} and
-    #    raise ConfigurationError otherwise.
-    # 4. Make sure nothing in the code base ever logs `settings` directly.
-    #    Always log settings.redacted(). (Settings.__repr__ already hides
-    #    the key because of repr=False — keep it that way.)
+    # Remaining coordination items for PARTNER 2 (no code needed):
+    # - When Partner 1 calibrates MIN_SIMILARITY (rag/retriever.py), copy the
+    #   value into .env.example with a one-line comment on how it was measured.
+    # - Never log `settings` directly; always log settings.redacted().
+    #   (Settings.__repr__ already hides the key because of repr=False.)
     #
     # EDGE CASES:
     # - .env missing entirely            -> defaults, mock mode, no crash.
@@ -223,12 +225,8 @@ def _validate_real_mode(settings: Settings) -> None:
         )
     if not settings.docs_dir.is_dir():
         raise ConfigurationError(f"DOCS_DIR does not exist: {settings.docs_dir}")
-    # TODO(PARTNER 2):
-    # 1. If settings.llm_base_url is set, check it starts with "http://" or
-    #    "https://"; otherwise raise ConfigurationError naming LLM_BASE_URL.
-    # 2. Do NOT check here that the index exists — a missing index is a
-    #    runtime state reported by rag.pipeline as IndexNotReadyError with the
-    #    exact rebuild command, not a configuration error.
+    # A missing index is NOT checked here on purpose: it is a runtime state
+    # reported by rag.pipeline as IndexNotReadyError with the rebuild command.
 
 
 @lru_cache(maxsize=1)

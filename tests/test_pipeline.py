@@ -101,7 +101,7 @@ def clean_env(monkeypatch, tmp_path):
     for key in list(os.environ):
         if key in {
             "RAG_MODE", "TOP_K", "CHUNK_SIZE", "CHUNK_OVERLAP", "LLM_API_KEY", "MIN_SIMILARITY",
-            "PDF_EXTRACTOR", "DOCS_DIR", "INDEX_DIR", "LLM_BASE_URL", "LLM_MODEL",
+            "PDF_EXTRACTOR", "DOCS_DIR", "INDEX_DIR", "LLM_BASE_URL", "LLM_MODEL", "LOG_LEVEL",
         }:
             monkeypatch.delenv(key, raising=False)
     return tmp_path / "no.env"  # non-existent .env file -> only os.environ is used
@@ -115,7 +115,8 @@ def test_config_defaults_to_mock(clean_env):
 
 @pytest.mark.parametrize(
     "key,value",
-    [("TOP_K", "five"), ("TOP_K", "0"), ("RAG_MODE", "prod"), ("PDF_EXTRACTOR", "ocr"), ("MIN_SIMILARITY", "2")],
+    [("TOP_K", "five"), ("TOP_K", "0"), ("RAG_MODE", "prod"), ("PDF_EXTRACTOR", "ocr"), ("MIN_SIMILARITY", "2"),
+     ("LOG_LEVEL", "LOUD"), ("LLM_BASE_URL", "api.groq.com/openai/v1")],
 )
 def test_config_rejects_invalid_values(clean_env, monkeypatch, key, value):
     monkeypatch.setenv(key, value)
