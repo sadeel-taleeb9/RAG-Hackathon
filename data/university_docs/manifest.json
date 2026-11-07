@@ -1,0 +1,19 @@
+{
+  "_comment": "OWNER: Partner 1. One entry per PDF in this folder. ingest.py copies doc_title and doc_version into every PageRecord so the generator can resolve conflicts between documents (newer program-specific plans override the older general catalog). Keep keys identical to the PDF filenames.",
+  "documents": {
+    "1_Computer_Engineering_4_YEAR_PLAN_APRIL_25_2026.pdf": {
+      "doc_title": "Computer Engineering B.Sc. Program and 4-Year Study Plan (ENCO)",
+      "doc_version": "2026-04-25",
+      "language": "ar+en",
+      "scope": "Computer Engineering program only: credit-hour distribution, required and elective courses with prerequisites, semester-by-semester plan, course descriptions.",
+      "priority": 1
+    },
+    "BZU.pdf": {
+      "doc_title": "Birzeit University Undergraduate Catalog",
+      "doc_version": "2024-2025",
+      "language": "ar",
+      "scope": "All undergraduate programs, university-wide academic regulations (admission, attendance, GPA, academic warning, graduation), study plans and course descriptions for every faculty.",
+      "priority": 2
+    }
+  }
+}

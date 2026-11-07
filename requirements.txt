@@ -1,0 +1,27 @@
+# OWNER: Partner 2 — Full-Stack & Integration Engineer
+# Python 3.10–3.12 recommended (faiss-cpu and torch publish wheels for these).
+#
+# Install (CPU-only torch first keeps the download small, ~200 MB instead of ~2 GB):
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+#   pip install -r requirements.txt
+
+# --- UI ---------------------------------------------------------------------
+streamlit>=1.37,<2.0
+
+# --- PDF extraction ----------------------------------------------------------
+pymupdf>=1.24,<2.0          # default extractor (PDF_EXTRACTOR=pymupdf)
+pypdf>=4.2,<7.0             # fallback extractor; verified on both PDFs (see data/university_docs/README.md)
+
+# --- Embeddings + vector store -------------------------------------------------
+sentence-transformers>=3.0,<6.0   # pulls in torch + transformers
+faiss-cpu>=1.8,<2.0
+numpy>=1.26,<3.0
+
+# --- LLM (any OpenAI-compatible API: OpenAI, Groq, OpenRouter, Gemini, Ollama) -
+openai>=1.40,<3.0
+
+# --- Configuration -------------------------------------------------------------
+python-dotenv>=1.0,<2.0
+
+# --- Testing -------------------------------------------------------------------
+pytest>=8.0,<10.0
